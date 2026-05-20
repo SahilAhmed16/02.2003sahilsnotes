@@ -1,78 +1,563 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explore Notes</title>
-    <link rel="stylesheet" href="style.css">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037282476988013"
-     crossorigin="anonymous"></script>
+    <title>MCA Notes Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #020617 0%, #0f172a 30%, #1e3a8a 60%, #0c4a6e 100%);
+            min-height: 100vh;
+            color: #e0f2fe;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(60px); }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.3), transparent 70%);
+            top: -10%;
+            left: -10%;
+            animation: orbFloat1 25s infinite ease-in-out;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.25), transparent 70%);
+            bottom: -15%;
+            right: -10%;
+            animation: orbFloat2 30s infinite ease-in-out;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent 70%);
+            top: 40%;
+            left: 50%;
+            animation: orbFloat3 20s infinite ease-in-out;
+        }
+
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(80px, 60px) scale(1.1); }
+            66% { transform: translate(-40px, -30px) scale(0.9); }
+        }
+
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-60px, -80px) scale(1.15); }
+            66% { transform: translate(50px, 40px) scale(0.85); }
+        }
+
+        @keyframes orbFloat3 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2) translate(30px, -20px); }
+        }
+
+        /* Particles */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(147, 197, 253, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(147, 197, 253, 0.8);
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header-badge {
+            display: inline-block;
+            padding: 8px 24px;
+            background: rgba(37, 99, 235, 0.2);
+            border: 1px solid rgba(96, 165, 250, 0.4);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #93c5fd;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(37, 99, 235, 0.5); }
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #e0f2fe 0%, #7dd3fc 30%, #38bdf8 60%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInDown 1s ease-out 0.2s both, glowPulse 3s ease-in-out infinite;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.3)); }
+            50% { filter: drop-shadow(0 0 50px rgba(56, 189, 248, 0.6)); }
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #93c5fd;
+            animation: fadeInDown 1s ease-out 0.4s both;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TABS CONTAINER ===== */
+        .tabs-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1000px;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tabs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        /* ===== SUBJECT TAB CARD ===== */
+        .subject-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 30px;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(96, 165, 250, 0.2);
+            border-radius: 24px;
+            text-decoration: none;
+            color: #e0f2fe;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .subject-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(14, 165, 233, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .subject-tab::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(100, 181, 246, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .subject-tab:hover::before,
+        .subject-tab:hover::after {
+            opacity: 1;
+        }
+
+        .subject-tab:hover {
+            transform: translateY(-12px) scale(1.03);
+            border-color: rgba(96, 165, 250, 0.6);
+            box-shadow: 
+                0 25px 50px rgba(37, 99, 235, 0.3), 
+                0 0 60px rgba(56, 189, 248, 0.15),
+                inset 0 0 30px rgba(56, 189, 248, 0.05);
+        }
+
+        .subject-tab:nth-child(1) { animation: cardPop 0.6s ease-out 0.8s both; }
+        .subject-tab:nth-child(2) { animation: cardPop 0.6s ease-out 0.95s both; }
+        .subject-tab:nth-child(3) { animation: cardPop 0.6s ease-out 1.1s both; }
+        .subject-tab:nth-child(4) { animation: cardPop 0.6s ease-out 1.25s both; }
+        .subject-tab:nth-child(5) { animation: cardPop 0.6s ease-out 1.4s both; }
+
+        @keyframes cardPop {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Icon */
+        .tab-icon-wrap {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.3), rgba(14, 165, 233, 0.3));
+            border: 2px solid rgba(96, 165, 250, 0.3);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .subject-tab:hover .tab-icon-wrap {
+            transform: scale(1.15) rotate(8deg);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.5), rgba(14, 165, 233, 0.5));
+            border-color: rgba(147, 197, 253, 0.6);
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.4), 0 0 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .tab-icon-wrap::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #2563eb, #0ea5e9, #38bdf8, #2563eb);
+            background-size: 300% 300%;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            animation: gradientRotate 3s linear infinite;
+        }
+
+        .subject-tab:hover .tab-icon-wrap::before {
+            opacity: 0.4;
+        }
+
+        @keyframes gradientRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Title */
+        .tab-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e0f2fe;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .subject-tab:hover .tab-title {
+            color: #fff;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+
+        /* Subtitle */
+        .tab-subtitle {
+            font-size: 0.9rem;
+            color: #93c5fd;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .subject-tab:hover .tab-subtitle {
+            color: #bfdbfe;
+        }
+
+        /* Arrow indicator */
+        .tab-arrow {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #60a5fa;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            z-index: 2;
+        }
+
+        .subject-tab:hover .tab-arrow {
+            opacity: 1;
+            transform: translateX(0);
+            color: #38bdf8;
+        }
+
+        /* Ripple effect on click */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(56, 189, 248, 0.4);
+            transform: scale(0);
+            animation: rippleEffect 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            margin-top: 60px;
+            color: #60a5fa;
+            font-size: 0.9rem;
+            animation: fadeInUp 1s ease-out 1.6s both;
+        }
+
+        .footer-line {
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+            margin: 0 auto 20px;
+            animation: linePulse 3s infinite;
+        }
+
+        @keyframes linePulse {
+            0%, 100% { opacity: 0.5; transform: scaleX(1); }
+            50% { opacity: 1; transform: scaleX(1.5); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body { padding: 30px 15px; }
+            .header { margin-bottom: 40px; }
+            .header h1 { font-size: 2rem; }
+            .tabs-grid { grid-template-columns: 1fr; gap: 16px; }
+            .subject-tab { padding: 30px 20px; }
+            .tab-icon-wrap { width: 70px; height: 70px; font-size: 2.2rem; }
+            .tab-title { font-size: 1.2rem; }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #2563eb, #0ea5e9);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #3b82f6, #38bdf8);
+        }
+    </style>
 </head>
-
 <body>
-    <!-- NOTES SECTION -->
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="particles-container" id="particles"></div>
 
-    <section id="notes-section" class="notes-section">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-badge">MCA Semester 1</div>
+        <h1>Explore Notes</h1>
+        <p>Master of Computer Applications — Subject Notes Hub</p>
+    </header>
 
-        <h2 class="section-title">
-            Explore Notes
-        </h2>
+    <!-- Subject Tabs -->
+    <div class="tabs-wrapper">
+        <div class="tabs-grid">
+            <a href="management.html" class="subject-tab" onclick="createRipple(event, this)">
+                <div class="tab-icon-wrap">📊</div>
+                <div class="tab-title">Management</div>
+                <div class="tab-subtitle">Principles & Practices</div>
+                <div class="tab-arrow">→</div>
+            </a>
 
-        <div class="notes-container">
+            <a href="DBMS.html" class="subject-tab" onclick="createRipple(event, this)">
+                <div class="tab-icon-wrap">🗄️</div>
+                <div class="tab-title">DBMS</div>
+                <div class="tab-subtitle">Database Management Systems</div>
+                <div class="tab-arrow">→</div>
+            </a>
 
-            <!-- MANAGEMENT -->
+            <a href="Operating system.html" class="subject-tab" onclick="createRipple(event, this)">
+                <div class="tab-icon-wrap">⚙️</div>
+                <div class="tab-title">Operating System</div>
+                <div class="tab-subtitle">System Software & Architecture</div>
+                <div class="tab-arrow">→</div>
+            </a>
 
-            <div class="note-card">
+            <a href="Java.html" class="subject-tab" onclick="createRipple(event, this)">
+                <div class="tab-icon-wrap">☕</div>
+                <div class="tab-title">Java Programming</div>
+                <div class="tab-subtitle">Object-Oriented Development</div>
+                <div class="tab-arrow">→</div>
+            </a>
 
-                <h3>Management</h3>
-
-                <p>
-                    Handwritten management notes from professors.
-                </p>
-
-                <a href="management.html">
-                    Open Notes
-                </a>
-
-            </div>
-
-            <!-- DBMS -->
-
-            <div class="note-card">
-
-                <h3>DBMS</h3>
-
-                <p>
-                    Database Management System handwritten notes.
-                </p>
-
-                <a href="dbms.html">
-                    Open Notes
-                </a>
-
-            </div>
-
-            <!-- JAVA -->
-
-            <div class="note-card">
-
-                <h3>JAVA</h3>
-
-                <p>
-                    Java programming handwritten semester notes.
-                </p>
-
-                <a href="java.html">
-                    Open Notes
-                </a>
-
-            </div>
-
+            <a href="computer_architecture.html" class="subject-tab" onclick="createRipple(event, this)">
+                <div class="tab-icon-wrap">🖥️</div>
+                <div class="tab-title">Computer Architecture</div>
+                <div class="tab-subtitle">Hardware & Organization</div>
+                <div class="tab-arrow">→</div>
+            </a>
         </div>
+    </div>
 
-    </section>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-line"></div>
+        <p>Master of Computer Applications | Semester 1 | Notes Explorer</p>
+    </footer>
 
+    <script>
+        // ===== PARTICLES =====
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const count = 80;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (Math.random() * 15 + 10) + 's';
+                p.style.animationDelay = Math.random() * 20 + 's';
+                const size = Math.random() * 3 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.opacity = Math.random() * 0.5 + 0.3;
+                container.appendChild(p);
+            }
+        }
+
+        // ===== RIPPLE EFFECT =====
+        function createRipple(event, element) {
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (event.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (event.clientY - rect.top - size / 2) + 'px';
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // ===== PARALLAX EFFECT =====
+        document.addEventListener('mousemove', (e) => {
+            const orbs = document.querySelectorAll('.orb');
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            
+            orbs.forEach((orb, i) => {
+                const speed = (i + 1) * 15;
+                orb.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+        });
+    </script>
 </body>
-
 </html>
+
