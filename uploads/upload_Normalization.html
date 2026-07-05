@@ -157,8 +157,73 @@ td.fk{color:var(--accent5);font-weight:700;}
 .dots button{width:8px;height:8px;border-radius:50%;background:var(--border);border:none;cursor:pointer;transition:all .25s ease;}
 .dots button.active{background:var(--accent1);width:22px;border-radius:5px;}
 
+/* ===================================================================
+   PHONE / SMALL-SCREEN RESPONSIVE MODE
+   Below this width the page becomes a normal scrolling document:
+   the topbar and bottombar stick in place while the active topic's
+   content simply flows and scrolls with the page — no more fixed,
+   clipped viewport.
+=================================================================== */
+@media (max-width:768px){
+  html,body{height:auto;overflow:visible;}
+
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    background:#fff;
+    height:auto;
+    padding:12px 5vw;
+    flex-wrap:wrap;
+    row-gap:8px;
+  }
+  .brand{font-size:14px;order:1;}
+  .counter{order:2;font-size:12px;}
+  .progress-track{order:3;flex-basis:100%;max-width:100%;margin:0;height:5px;}
+
+  .viewport{
+    height:auto;
+    overflow:visible;
+    position:static;
+  }
+  .topic{
+    position:static;
+    display:none;
+    opacity:1;
+    transform:none;
+    pointer-events:auto;
+    height:auto;
+    min-height:calc(100vh - 130px);
+    overflow-y:visible;
+    padding:26px 6vw 40px;
+    transition:none;
+  }
+  .topic.active{display:flex;}
+
+  .two-col{gap:26px;}
+  .hero-topic h1{font-size:clamp(36px,13vw,60px);}
+  .topic h2{font-size:clamp(22px,6vw,30px);}
+  .lede{font-size:15px;}
+
+  .card-grid{grid-template-columns:1fr 1fr;gap:12px;}
+  .tables-row{flex-direction:column;}
+  .tables-row>div{min-width:0;width:100%;}
+
+  .bottombar{
+    position:sticky;bottom:0;z-index:20;
+    background:#fff;
+    height:auto;
+    padding:12px 5vw;
+    padding-bottom:calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width:480px){
+  .card-grid{grid-template-columns:1fr;}
+  .topic{padding:22px 5vw 36px;}
+  table{font-size:12.5px;}
+  th,td{padding:7px 10px;}
+}
+
 @media (max-width:640px){
-  .bottombar{padding:0 4vw;}
   .nav-btn span{display:none;}
   .nav-btn{padding:12px 14px;}
   .dots{display:none;}
