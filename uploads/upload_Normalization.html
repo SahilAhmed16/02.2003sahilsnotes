@@ -90,8 +90,8 @@ p{color:var(--text-dim);font-size:15.5px;line-height:1.7;}
 
 /* ===== tables ===== */
 .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;}
-table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:13.5px;}
-th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);word-wrap:break-word;overflow-wrap:break-word;}
+table{border-collapse:collapse;width:100%;font-size:13.5px;white-space:nowrap;}
+th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--border);}
 th{background:var(--accent1);color:#fff;font-weight:600;font-size:12px;letter-spacing:.03em;text-transform:uppercase;}
 tbody tr:nth-child(even){background:var(--band);}
 td.pk{color:var(--accent1);font-weight:700;}
@@ -191,7 +191,7 @@ td.fk{color:var(--accent5);font-weight:700;}
     transform:none;
     pointer-events:auto;
     height:auto;
-    min-height:calc(var(--vh, 1vh) * 100 - var(--bars-height, 130px));
+    min-height:calc(100vh - 130px);
     overflow-y:visible;
     padding:26px 6vw 40px;
     transition:none;
@@ -603,19 +603,7 @@ function render(){
   progressFill.style.width = ((current+1)/topics.length*100) + '%';
   prevBtn.disabled = current === 0;
   nextBtn.disabled = current === topics.length - 1;
-  syncViewportVars();
 }
-
-function syncViewportVars(){
-  const topbar = document.querySelector('.topbar');
-  const bottombar = document.querySelector('.bottombar');
-  const barsHeight = topbar.offsetHeight + bottombar.offsetHeight;
-  document.documentElement.style.setProperty('--bars-height', barsHeight + 'px');
-  document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
-}
-window.addEventListener('resize', syncViewportVars);
-window.addEventListener('orientationchange', syncViewportVars);
-syncViewportVars();
 
 function goTo(i){
   if(i < 0 || i >= topics.length) return;
