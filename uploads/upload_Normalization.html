@@ -258,12 +258,32 @@ td.fk{color:var(--accent5);font-weight:700;}
       <div>
         <div class="table-label">A Table Splits Into Linked Tables</div>
         <div class="tables-row">
-          <div class="table-block"><div class="table-label">Employee</div></div>
-          <div class="table-block"><div class="table-label">Department</div></div>
-        </div>
-        <div class="card-grid" style="grid-template-columns:1fr 1fr;">
-          <div class="card"><h3>Employee</h3><p>Emp_ID · Emp_Name · Dept_ID (FK)</p></div>
-          <div class="card"><h3>Department</h3><p>Dept_ID (PK) · Dept · Dept_Location</p></div>
+          <div class="table-block">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Emp_ID</th><th>Emp_Name</th><th>Dept_ID</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">101</td><td>Sahil</td><td class="fk">D1</td></tr>
+                  <tr><td class="pk">102</td><td>Rohit</td><td class="fk">D2</td></tr>
+                  <tr><td class="pk">103</td><td>Anas</td><td class="fk">D3</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-label" style="margin-top:4px;">Employee</div>
+          </div>
+          <div class="table-block">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Dept_ID</th><th>Dept</th><th>Dept_Location</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">D1</td><td>HR</td><td>London</td></tr>
+                  <tr><td class="pk">D2</td><td>Finance</td><td>Australia</td></tr>
+                  <tr><td class="pk">D3</td><td>IT</td><td>Italy</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-label" style="margin-top:4px;">Department</div>
+          </div>
         </div>
       </div>
     </div>
