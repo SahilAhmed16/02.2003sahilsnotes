@@ -229,6 +229,680 @@ td.fk{color:var(--accent5);font-weight:700;}
   .nav-btn{padding:12px 14px;}
   .dots{display:none;}
 }
+
+/* ===================================================================
+   DIGITAL BOARD / LARGE-DISPLAY RESPONSIVE MODE
+   For interactive whiteboards, classroom panels, and big wall screens
+   (roughly 1600px and up). These are viewed from several feet away,
+   so everything scales up rather than down: bigger type, roomier
+   spacing, thicker chrome, and larger touch targets for finger/stylus
+   input on the board itself.
+=================================================================== */
+@media (min-width:1600px){
+  body{font-size:19px;}
+  p{font-size:19px;}
+
+  .topbar{height:88px;padding:0 4vw;}
+  .brand{font-size:20px;gap:14px;}
+  .brand .sq{width:16px;height:16px;border-radius:4px;}
+  .progress-track{height:9px;max-width:520px;margin:0 32px;}
+  .counter{font-size:17px;}
+
+  .viewport{height:calc(100vh - 88px - 112px);}
+  .topic{padding:48px 6vw;}
+
+  .eyebrow{font-size:16px;}
+  .topic h2{font-size:clamp(38px,3.4vw,52px);margin-bottom:22px;}
+  .lede{font-size:22px;max-width:1000px;}
+
+  .two-col{gap:64px;}
+  .card-grid{gap:24px;}
+  .card{padding:26px 28px;border-radius:14px;}
+  .card h3{font-size:21px;margin-bottom:10px;}
+  .card p{font-size:18px;}
+  .card.warn{border-left-width:6px;}
+
+  table{font-size:18px;}
+  th,td{padding:16px 20px;}
+  th{font-size:15px;}
+  .table-label{font-size:15px;}
+
+  .steps{gap:18px;max-width:1000px;}
+  .steps li{padding-left:52px;font-size:19px;}
+  .steps li::before{width:34px;height:34px;font-size:16px;border-radius:9px;}
+
+  .fd-chip{font-size:17px;padding:9px 16px;}
+  .badge{font-size:16px;padding:8px 18px;margin-bottom:20px;}
+
+  .roadmap-item{padding:26px 18px;border-radius:14px;}
+  .roadmap-item .num{font-size:32px;}
+  .roadmap-item .label{font-size:15px;}
+
+  .chain span{font-size:17px;padding:10px 20px;}
+
+  .hero-topic h1{font-size:clamp(64px,7vw,110px);}
+  .hero-sub{font-size:19px;}
+
+  .bottombar{height:112px;padding:0 4vw;}
+  .nav-btn{padding:18px 32px;font-size:19px;border-radius:12px;gap:14px;}
+  .nav-btn svg{width:22px;height:22px;}
+  .dots{gap:10px;}
+  .dots button{width:12px;height:12px;}
+  .dots button.active{width:32px;}
+}
+
+@media (min-width:2200px){
+  body{font-size:22px;}
+  p{font-size:22px;}
+  .lede{font-size:26px;}
+  .topic h2{font-size:clamp(46px,3.2vw,64px);}
+  table{font-size:21px;}
+  th,td{padding:20px 24px;}
+  .card h3{font-size:24px;}
+  .card p{font-size:21px;}
+  .hero-topic h1{font-size:clamp(80px,7vw,140px);}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="sq"></span>Normalization</div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="counter" id="counter">01 / 15</div>
+</div>
+
+<div class="viewport" id="viewport">
+
+  <section class="topic hero-topic" data-title="Intro">
+    <div class="eyebrow">Database Design</div>
+    <h1>NORMALIZATION</h1>
+    <div class="hero-sub">Organizing data · Eliminating redundancy</div>
+  </section>
+
+  <section class="topic" data-title="Introduction">
+    <div class="two-col">
+      <div>
+        <div class="eyebrow">01 — Overview</div>
+        <h2>Introduction to Database Normalization</h2>
+        <p class="lede">Normalization is an important process in database design that helps improve the database's efficiency, consistency, and accuracy. It makes data easier to manage and maintain, and keeps the database adaptable to changing business needs.</p>
+        <p style="margin-top:14px;">It organizes attributes to reduce or eliminate <b style="color:var(--heading)">data redundancy</b> — the same data stored in different places, which unnecessarily increases the size of the database.</p>
+        <p style="margin-top:14px;">Data redundancy causes inconsistency during insert, delete and update operations, making data management difficult. Normalization splits a table into multiple tables, which are linked whenever a query needs their combined data.</p>
+      </div>
+      <div>
+        <div class="table-label">A Table Splits Into Linked Tables</div>
+        <div class="tables-row">
+          <div class="table-block">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Emp_ID</th><th>Emp_Name</th><th>Dept_ID</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">101</td><td>Sahil</td><td class="fk">D1</td></tr>
+                  <tr><td class="pk">102</td><td>Rohit</td><td class="fk">D2</td></tr>
+                  <tr><td class="pk">103</td><td>Anas</td><td class="fk">D3</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-label" style="margin-top:4px;">Employee</div>
+          </div>
+          <div class="table-block">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Dept_ID</th><th>Dept</th><th>Dept_Location</th></tr></thead>
+                <tbody>
+                  <tr><td class="pk">D1</td><td>HR</td><td>London</td></tr>
+                  <tr><td class="pk">D2</td><td>Finance</td><td>Australia</td></tr>
+                  <tr><td class="pk">D3</td><td>IT</td><td>Italy</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-label" style="margin-top:4px;">Department</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="Before &amp; After">
+    <div class="eyebrow">02 — In Practice</div>
+    <h2>Before vs. After Normalization</h2>
+    <div class="table-label" style="color:var(--accent2);">BEFORE — one table, repeated department info</div>
+    <div class="table-wrap" style="margin-bottom:18px;">
+      <table>
+        <thead><tr><th>Emp_ID</th><th>Emp_Name</th><th>Dept</th><th>Dept_Location</th><th>Emp_Skill</th></tr></thead>
+        <tbody>
+          <tr><td class="pk">101</td><td>Sahil</td><td>HR</td><td>London</td><td>Recruitment, Payroll</td></tr>
+          <tr><td class="pk">102</td><td>Rohit</td><td>Finance</td><td>Australia</td><td>Budgeting</td></tr>
+          <tr><td class="pk">103</td><td>Anas</td><td>HR</td><td>London</td><td>Recruitment</td></tr>
+          <tr><td class="pk">104</td><td>Atul</td><td>IT</td><td>Italy</td><td>Programmer</td></tr>
+          <tr><td class="pk">105</td><td>Abhishek</td><td>Testing</td><td>New York</td><td>Analyst</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="link-line">
+      <svg viewBox="0 0 30 12"><path d="M0 6h24" stroke="#156082" stroke-width="1.5"/><polygon points="20,2 28,6 20,10" fill="#156082"/></svg>
+      split into linked tables
+    </div>
+    <div class="table-label" style="color:var(--accent1);">AFTER — three linked tables</div>
+    <div class="tables-row">
+      <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Emp_ID</th><th>Emp_Name</th><th>Dept_ID</th></tr></thead>
+        <tbody><tr><td class="pk">101</td><td>Sahil</td><td class="fk">D1</td></tr><tr><td class="pk">102</td><td>Rohit</td><td class="fk">D2</td></tr><tr><td class="pk">103</td><td>Anas</td><td class="fk">D3</td></tr><tr><td class="pk">104</td><td>Atul</td><td class="fk">D4</td></tr><tr><td class="pk">105</td><td>Abhishek</td><td class="fk">D5</td></tr></tbody></table></div></div>
+      <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Dept_ID</th><th>Dept</th><th>Dept_Location</th></tr></thead>
+        <tbody><tr><td class="pk">D1</td><td>HR</td><td>London</td></tr><tr><td class="pk">D2</td><td>Finance</td><td>Australia</td></tr><tr><td class="pk">D3</td><td>IT</td><td>Italy</td></tr><tr><td class="pk">D4</td><td>Testing</td><td>New York</td></tr></tbody></table></div></div>
+      <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Emp_ID</th><th>Emp_Skill</th></tr></thead>
+        <tbody><tr><td class="fk">101</td><td>Recruitment</td></tr><tr><td class="fk">101</td><td>Payroll</td></tr><tr><td class="fk">102</td><td>Budgeting</td></tr><tr><td class="fk">103</td><td>Recruitment</td></tr><tr><td class="fk">104</td><td>Programmer</td></tr><tr><td class="fk">105</td><td>Analyst</td></tr></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="Why It Matters">
+    <div class="eyebrow">03 — Motivation</div>
+    <h2>The Need for Normalization</h2>
+    <p class="lede">The primary goal of normalizing relations is to eliminate three anomalies. Left unchecked, they cause data redundancy and threaten data integrity as a database grows.</p>
+    <div class="card-grid">
+      <div class="card warn"><h3>Insertion Anomalies</h3><p>You can't insert data because required fields are missing or incomplete — e.g. a record can't be added without a value for its primary key.</p></div>
+      <div class="card warn"><h3>Deletion Anomalies</h3><p>Deleting one record unintentionally destroys other data — e.g. removing a customer also wipes out every order linked to them.</p></div>
+      <div class="card warn"><h3>Update Anomalies</h3><p>Updating data in one place but not every duplicate copy — e.g. an employee's salary changes in one record but not the others, breaking reports.</p></div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="Features">
+    <div class="eyebrow">04 — Benefits</div>
+    <h2>Features of Database Normalization</h2>
+    <div class="card-grid">
+      <div class="card"><h3>Eliminates Redundancy</h3><p>Removes repeated data across the database, improving efficiency and consistency.</p></div>
+      <div class="card"><h3>Ensures Consistency</h3><p>Prevents contradictions that arise from multiple versions of the same fact.</p></div>
+      <div class="card"><h3>Simplifies Management</h3><p>Breaks complex structures into simpler tables that are easier to update and retrieve.</p></div>
+      <div class="card"><h3>Improves Design</h3><p>Structured, systematic organization that's easier to maintain and adapt over time.</p></div>
+      <div class="card"><h3>Standardization</h3><p>Data is stored in a consistent, uniform manner via well-defined table relationships.</p></div>
+    </div>
+  </section>
+
+  <section class="topic hero-topic" data-title="Normal Forms">
+    <div class="eyebrow" style="justify-content:center;">05 — Roadmap</div>
+    <h2>Normal Forms in DBMS</h2>
+    <p class="lede">Each normal form builds on the one before it — a progressive tightening of the rules that govern how a table may store data.</p>
+    <div class="roadmap">
+      <div class="roadmap-item"><div class="num">1NF</div><div class="label">Atomic Values</div></div>
+      <div class="roadmap-item"><div class="num">2NF</div><div class="label">No Partial Dependency</div></div>
+      <div class="roadmap-item"><div class="num">3NF</div><div class="label">No Transitive Dependency</div></div>
+      <div class="roadmap-item"><div class="num">BCNF</div><div class="label">Every Determinant a Key</div></div>
+      <div class="roadmap-item"><div class="num">4NF</div><div class="label">No Multivalued Dependency</div></div>
+      <div class="roadmap-item"><div class="num">5NF</div><div class="label">Lossless Join</div></div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="1NF">
+    <div class="two-col">
+      <div>
+        <div class="badge">1NF</div>
+        <h2>First Normal Form</h2>
+        <p class="lede">A table is in 1NF if:</p>
+        <ul class="steps">
+          <li>All attributes contain only <b>atomic (indivisible)</b> values.</li>
+          <li>Each column contains values of a <b>single type</b>.</li>
+          <li>Each row is <b>unique</b> and identifiable by a primary key.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="table-label" style="color:var(--accent2);">BEFORE — multi-valued Courses column</div>
+        <div class="table-wrap" style="margin-bottom:16px;">
+          <table><thead><tr><th>ID</th><th>Teachers</th><th>Courses</th></tr></thead>
+          <tbody><tr><td class="pk">1</td><td>Anubhuti Mam</td><td>Java, DBMS</td></tr><tr><td class="pk">2</td><td>Neha Mam</td><td>Computer Architecture, OS</td></tr></tbody></table>
+        </div>
+        <div class="table-label" style="color:var(--accent1);">AFTER — atomic values, 1NF</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>ID</th><th>Teachers</th><th>Courses</th></tr></thead>
+          <tbody><tr><td class="pk">1</td><td>Anubhuti Mam</td><td>Java</td></tr><tr><td class="pk">1</td><td>Anubhuti Mam</td><td>DBMS</td></tr><tr><td class="pk">2</td><td>Neha Mam</td><td>Computer Architecture</td></tr><tr><td class="pk">2</td><td>Neha Mam</td><td>OS</td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="2NF">
+    <div class="badge">2NF</div>
+    <h2>Second Normal Form</h2>
+    <ul class="steps">
+      <li><b>Meet 1NF requirements</b> — all columns hold single, indivisible values with no repeating groups.</li>
+      <li><b>Eliminate partial dependencies</b> — a non-prime attribute must not depend on only part of a composite primary key.</li>
+    </ul>
+    <p class="lede" style="margin-top:18px;">A functional dependency A → B is a <b style="color:var(--heading)">partial dependency</b> if B depends on A, but B can also be determined by a proper subset of A. With a composite key made of more than one attribute, if some attribute depends on only part of that key rather than the whole key, that's a partial dependency — exactly what 2NF forbids.</p>
+  </section>
+
+  <section class="topic" data-title="2NF Example">
+    <div class="eyebrow">Applying 2NF</div>
+    <h2>Splitting a Composite Key Table</h2>
+    <div class="table-label" style="color:var(--accent2);">BEFORE 2NF — composite key (Player_ID, Team_ID)</div>
+    <div class="table-wrap no-scroll" style="margin-bottom:18px;">
+      <table style="font-size:12.5px;"><thead><tr><th>Player_ID</th><th>Team_ID</th><th>Player_Name</th><th>Team_Name</th><th>Team_Captain</th><th>Season</th></tr></thead>
+      <tbody>
+        <tr><td class="pk">P101</td><td class="pk">T01</td><td>V. Kohli</td><td>RCB</td><td>R. Patidar</td><td>2026</td></tr>
+        <tr><td class="pk">P102</td><td class="pk">T01</td><td>P. Salt</td><td>RCB</td><td>R. Patidar</td><td>2026</td></tr>
+        <tr><td class="pk">P103</td><td class="pk">T02</td><td>R. Sharma</td><td>MI</td><td>H. Pandya</td><td>2026</td></tr>
+        <tr><td class="pk">P104</td><td class="pk">T02</td><td>J. Bumrah</td><td>MI</td><td>H. Pandya</td><td>2026</td></tr>
+        <tr><td class="pk">P105</td><td class="pk">T03</td><td>M. Dhoni</td><td>CSK</td><td>R. Gaikwad</td><td>2026</td></tr>
+      </tbody></table>
+    </div>
+    <div class="table-label" style="color:var(--accent1);">AFTER 2NF — three tables</div>
+    <div class="tables-row">
+      <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Player_ID</th><th>Player_Name</th></tr></thead>
+        <tbody><tr><td class="pk">P101</td><td>V. Kohli</td></tr><tr><td class="pk">P102</td><td>P. Salt</td></tr><tr><td class="pk">P103</td><td>R. Sharma</td></tr><tr><td class="pk">P104</td><td>J. Bumrah</td></tr><tr><td class="pk">P105</td><td>M. Dhoni</td></tr></tbody></table></div></div>
+      <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Team_ID</th><th>Team_Name</th><th>Team_Captain</th></tr></thead>
+        <tbody><tr><td class="pk">T01</td><td>RCB</td><td>R. Patidar</td></tr><tr><td class="pk">T02</td><td>MI</td><td>H. Pandya</td></tr><tr><td class="pk">T03</td><td>CSK</td><td>R. Gaikwad</td></tr></tbody></table></div></div>
+      <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Player_ID</th><th>Team_ID</th><th>Season</th></tr></thead>
+        <tbody><tr><td class="fk">P101</td><td class="fk">T01</td><td>2026</td></tr><tr><td class="fk">P102</td><td class="fk">T01</td><td>2026</td></tr><tr><td class="fk">P103</td><td class="fk">T02</td><td>2026</td></tr><tr><td class="fk">P104</td><td class="fk">T02</td><td>2026</td></tr><tr><td class="fk">P105</td><td class="fk">T03</td><td>2026</td></tr></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="3NF">
+    <div class="two-col">
+      <div>
+        <div class="badge">3NF</div>
+        <h2>Third Normal Form</h2>
+        <p class="lede">A relation is in 3NF if it satisfies both:</p>
+        <ul class="steps">
+          <li>It is already in <b>2NF</b> — no partial dependencies exist.</li>
+          <li>There is <b>no transitive dependency</b> for non-prime attributes — no non-key attribute depends on another non-key attribute; every non-key attribute must depend directly on the primary key.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="table-label" style="color:var(--accent2);">BEFORE 3NF</div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Cand_No</th><th>Cand_Name</th><th>Cand_State</th><th>Cand_Country</th><th>Cand_Age</th></tr></thead>
+          <tbody>
+            <tr><td class="pk">1</td><td>Sahil</td><td>Jharkhand</td><td>India</td><td>23</td></tr>
+            <tr><td class="pk">2</td><td>Aakash</td><td>West Bengal</td><td>India</td><td>25</td></tr>
+            <tr><td class="pk">3</td><td>Pankaj</td><td>West Bengal</td><td>India</td><td>24</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="Transitive Dependency">
+    <div class="two-col">
+      <div>
+        <div class="eyebrow">Finding the Problem</div>
+        <h2>Steps to Find Transitive Dependency</h2>
+        <ul class="steps">
+          <li><b>Write the functional dependency set.</b>
+            <div class="fd-wrap">
+              <span class="fd-chip">Cand_No <span class="arrow">→</span> Cand_Name</span>
+              <span class="fd-chip">Cand_No <span class="arrow">→</span> Cand_State</span>
+              <span class="fd-chip">Cand_State <span class="arrow">→</span> Cand_Country</span>
+              <span class="fd-chip">Cand_No <span class="arrow">→</span> Cand_Age</span>
+            </div>
+          </li>
+          <li><b>Determine the candidate key</b> — {Cand_No} uniquely identifies every other attribute.</li>
+          <li><b>Spot the transitive link:</b> Cand_No → Cand_State → Cand_Country means Cand_Country depends on Cand_No only <i>through</i> Cand_State.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="table-label" style="color:var(--accent1);">SPLIT TO SATISFY 3NF</div>
+        <div class="table-block" style="margin-bottom:14px;">
+          <div class="table-wrap"><table><thead><tr><th>Cand_No</th><th>Cand_Name</th><th>Cand_State</th><th>Cand_Age</th></tr></thead>
+          <tbody><tr><td class="pk">1</td><td>Sahil</td><td class="fk">Jharkhand</td><td>23</td></tr><tr><td class="pk">2</td><td>Aakash</td><td class="fk">West Bengal</td><td>25</td></tr><tr><td class="pk">3</td><td>Pankaj</td><td class="fk">West Bengal</td><td>24</td></tr></tbody></table></div>
+          <div class="table-label" style="margin-top:5px;">Candidate Table</div>
+        </div>
+        <div class="table-block">
+          <div class="table-wrap"><table><thead><tr><th>Cand_State</th><th>Cand_Country</th></tr></thead>
+          <tbody><tr><td class="pk">Jharkhand</td><td>India</td></tr><tr><td class="pk">West Bengal</td><td>India</td></tr></tbody></table></div>
+          <div class="table-label" style="margin-top:5px;">State–Country Table</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="BCNF">
+    <div class="two-col">
+      <div>
+        <div class="badge">BCNF</div>
+        <h2>Boyce–Codd Normal Form</h2>
+        <ul class="steps">
+          <li>The table must already be in <b>3NF</b>.</li>
+          <li>For every functional dependency X → Y, <b>X must be a super-key</b>.</li>
+        </ul>
+        <p class="lede" style="margin-top:16px;">BCNF prevents update, insert, and delete anomalies by ensuring every determinant is a super key — something 2NF and 3NF can still miss when a dependency's determinant isn't one.</p>
+      </div>
+      <div>
+        <div class="table-label" style="color:var(--accent2);">BEFORE — Teacher isn't a super key</div>
+        <div class="table-wrap" style="margin-bottom:16px;">
+          <table><thead><tr><th>Student</th><th>Teacher</th><th>Subject</th></tr></thead>
+          <tbody><tr><td>Sahil</td><td>R.Das</td><td>DB</td></tr><tr><td>Sahil</td><td>Kunal</td><td>C</td></tr><tr><td>Virat</td><td>R.Das</td><td>DB</td></tr><tr><td>Virat</td><td>Raman</td><td>C</td></tr></tbody></table>
+        </div>
+        <div class="tables-row">
+          <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Teacher</th><th>Subject</th></tr></thead>
+            <tbody><tr><td class="pk">R.Das</td><td>DB</td></tr><tr><td class="pk">Kunal</td><td>C</td></tr><tr><td class="pk">Raman</td><td>C</td></tr></tbody></table></div></div>
+          <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Student</th><th>Teacher</th></tr></thead>
+            <tbody><tr><td>Sahil</td><td class="fk">R.Das</td></tr><tr><td>Sahil</td><td class="fk">Kunal</td></tr><tr><td>Virat</td><td class="fk">R.Das</td></tr><tr><td>Virat</td><td class="fk">Raman</td></tr></tbody></table></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="4NF">
+    <div class="two-col">
+      <div>
+        <div class="badge">4NF</div>
+        <h2>Fourth Normal Form</h2>
+        <ul class="steps">
+          <li>The relation must already be in <b>BCNF</b>.</li>
+          <li>It must have <b>no multivalued dependency</b>.</li>
+        </ul>
+        <p class="lede" style="margin-top:14px;">A multivalued dependency occurs when one attribute determines multiple independent values of another — it always needs at least three attributes, where two are independent but both depend on a third (A →→ B, with B and C independent).</p>
+      </div>
+      <div>
+        <div class="table-label" style="color:var(--accent2);">Sahil has 2 hobbies × 2 languages → 4 rows</div>
+        <div class="table-wrap" style="margin-bottom:16px;">
+          <table><thead><tr><th>Student</th><th>Hobby</th><th>Language</th></tr></thead>
+          <tbody><tr><td>Sahil</td><td>Cricket</td><td>English</td></tr><tr><td>Sahil</td><td>Cricket</td><td>Hindi</td></tr><tr><td>Sahil</td><td>Coding</td><td>English</td></tr><tr><td>Sahil</td><td>Coding</td><td>Hindi</td></tr></tbody></table>
+        </div>
+        <div class="tables-row">
+          <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Student</th><th>Hobby</th></tr></thead>
+            <tbody><tr><td>Sahil</td><td>Cricket</td></tr><tr><td>Sahil</td><td>Coding</td></tr></tbody></table></div></div>
+          <div class="table-block"><div class="table-wrap"><table><thead><tr><th>Student</th><th>Language</th></tr></thead>
+            <tbody><tr><td>Sahil</td><td>English</td></tr><tr><td>Sahil</td><td>Hindi</td></tr></tbody></table></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="topic" data-title="5NF">
+    <div class="badge">5NF</div>
+    <h2>Fifth Normal Form — Project-Join Normal Form</h2>
+    <p class="lede">5NF is one of the highest levels of normalization. A table is in 5NF if it's already in 4NF <b style="color:var(--heading)">and</b> it cannot be broken down into smaller tables without losing data.</p>
+    <div class="tables-row" style="margin-top:18px;">
+      <div class="table-block">
+        <div class="table-label">Original Table</div>
+        <div class="table-wrap"><table><thead><tr><th>Subject</th><th>Class</th><th>Teacher</th></tr></thead>
+        <tbody><tr><td>math</td><td>class 10</td><td>kartik</td></tr><tr><td>math</td><td>class 9</td><td>yash</td></tr><tr><td>math</td><td>class 10</td><td>yash</td></tr><tr><td>science</td><td>class 10</td><td>yash</td></tr></tbody></table></div>
+      </div>
+      <div class="table-block">
+        <div class="table-label">R1 — Subject / Class</div>
+        <div class="table-wrap"><table><thead><tr><th>Subject</th><th>Class</th></tr></thead>
+        <tbody><tr><td>math</td><td>class 9</td></tr><tr><td>math</td><td>class 10</td></tr><tr><td>science</td><td>class 10</td></tr></tbody></table></div>
+      </div>
+      <div class="table-block">
+        <div class="table-label">R2 — Class / Teacher</div>
+        <div class="table-wrap"><table><thead><tr><th>Class</th><th>Teacher</th></tr></thead>
+        <tbody><tr><td>class 10</td><td>kartik</td></tr><tr><td>class 9</td><td>yash</td></tr><tr><td>class 10</td><td>yash</td></tr></tbody></table></div>
+      </div>
+    </div>
+    <p style="margin-top:16px;max-width:800px;">Rejoining R1 ⋈ R2 produces an extra tuple that never existed in the original data (e.g. <i>science / class 10 / kartik</i>) — a <b style="color:var(--accent2)">lossy</b> decomposition. That breaks 5NF's rule of non-loss decomposition, so this particular split is not a valid 5NF structure.</p>
+  </section>
+
+  <section class="topic hero-topic" data-title="Summary">
+    <div class="eyebrow" style="justify-content:center;">Recap</div>
+    <h2>One Table, Refined in Six Steps</h2>
+    <p class="lede">From atomic values to lossless joins, each normal form removes one more way redundancy could creep back in.</p>
+    <div class="chain">
+      <span>1NF</span><span>2NF</span><span>3NF</span><span>BCNF</span><span>4NF</span><span>5NF</span>
+    </div>
+  </section>
+
+</div>
+
+<div class="bottombar">
+  <button class="nav-btn prev" id="prevBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    <span>Previous</span>
+  </button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn next" id="nextBtn">
+    <span>Next</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+</div>
+
+<script>
+const topics = Array.from(document.querySelectorAll('.topic'));
+const dotsWrap = document.getElementById('dots');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const counter = document.getElementById('counter');
+const progressFill = document.getElementById('progressFill');
+
+let current = 0;
+
+topics.forEach((t, i) => {
+  const d = document.createElement('button');
+  d.addEventListener('click', () => goTo(i));
+  dotsWrap.appendChild(d);
+});
+const dots = Array.from(dotsWrap.children);
+
+function render(){
+  topics.forEach((t, i) => t.classList.toggle('active', i === current));
+  dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  counter.textContent = String(current+1).padStart(2,'0') + ' / ' + topics.length;
+  progressFill.style.width = ((current+1)/topics.length*100) + '%';
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === topics.length - 1;
+  syncViewportVars();
+}
+
+function syncViewportVars(){
+  const topbar = document.querySelector('.topbar');
+  const bottombar = document.querySelector('.bottombar');
+  const barsHeight = topbar.offsetHeight + bottombar.offsetHeight;
+  document.documentElement.style.setProperty('--bars-height', barsHeight + 'px');
+  document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+}
+window.addEventListener('resize', syncViewportVars);
+window.addEventListener('orientationchange', syncViewportVars);
+syncViewportVars();
+
+function goTo(i){
+  if(i < 0 || i >= topics.length) return;
+  current = i;
+  render();
+}
+
+prevBtn.addEventListener('click', () => goTo(current - 1));
+nextBtn.addEventListener('click', () => goTo(current + 1));
+
+window.addEventListener('keydown', (e) => {
+  if(e.key === 'ArrowRight') goTo(current + 1);
+  if(e.key === 'ArrowLeft') goTo(current - 1);
+});
+
+render();
+</script>
+</body>
+</html>.topbar{
+  height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5vw;
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Poppins',sans-serif;font-weight:600;color:var(--heading);}
+.brand .sq{width:12px;height:12px;background:var(--accent1);border-radius:3px;}
+.progress-track{
+  flex:1;max-width:360px;height:6px;background:var(--band);border-radius:6px;margin:0 24px;overflow:hidden;
+}
+.progress-fill{height:100%;background:var(--accent1);width:6.6%;transition:width .4s ease;}
+.counter{font-family:monospace;font-size:13px;color:var(--text-dim);white-space:nowrap;}
+
+/* ===== topic viewport ===== */
+.viewport{
+  position:relative;
+  height:calc(100vh - 64px - 84px);
+  overflow:hidden;
+}
+.topic{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:34px 6vw;
+  overflow-y:auto;
+  opacity:0;
+  transform:translateX(40px);
+  pointer-events:none;
+  transition:opacity .45s ease, transform .45s ease;
+}
+.topic.active{
+  opacity:1;transform:translateX(0);pointer-events:auto;
+}
+.topic.prev-out{transform:translateX(-40px);}
+
+.eyebrow{
+  font-family:monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent1);margin-bottom:10px;
+}
+.topic h2{font-size:clamp(24px,3vw,36px);margin-bottom:16px;}
+.lede{max-width:760px;font-size:16.5px;color:var(--text);}
+
+/* ===== layout helpers ===== */
+.two-col{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;width:100%;}
+@media (max-width:900px){.two-col{grid-template-columns:1fr;}}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px;}
+.card{
+  background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 20px;
+  box-shadow:0 2px 10px rgba(14,40,65,0.04);
+}
+.card.warn{border-left:4px solid var(--accent2);}
+.card h3{font-size:15.5px;margin-bottom:6px;color:var(--heading);}
+.card p{font-size:13.5px;}
+
+/* ===== tables ===== */
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;}
+.table-wrap.no-scroll{overflow-x:visible;}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:13.5px;}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);word-wrap:break-word;overflow-wrap:break-word;}
+th{background:var(--accent1);color:#fff;font-weight:600;font-size:12px;letter-spacing:.03em;text-transform:uppercase;}
+tbody tr:nth-child(even){background:var(--band);}
+td.pk{color:var(--accent1);font-weight:700;}
+td.fk{color:var(--accent5);font-weight:700;}
+.table-label{font-family:monospace;font-size:11.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.tables-row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;}
+.tables-row>div{flex:1;min-width:200px;}
+.table-block{display:flex;flex-direction:column;gap:6px;}
+
+.link-line{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0;font-family:monospace;font-size:12px;color:var(--accent1);}
+.link-line svg{width:30px;height:12px;}
+
+/* steps */
+.steps{counter-reset:step;list-style:none;display:flex;flex-direction:column;gap:12px;max-width:740px;}
+.steps li{counter-increment:step;position:relative;padding-left:40px;color:var(--text-dim);font-size:14.5px;line-height:1.6;}
+.steps li::before{
+  content:counter(step);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:7px;
+  background:var(--band);border:1px solid var(--border);color:var(--accent1);font-family:monospace;
+  font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700;
+}
+.steps li b{color:var(--heading);}
+
+.fd-chip{display:inline-flex;align-items:center;gap:6px;font-family:monospace;font-size:13px;background:var(--band);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);margin:4px 6px 4px 0;}
+.fd-chip .arrow{color:var(--accent1);font-weight:700;}
+.fd-wrap{display:flex;flex-wrap:wrap;margin-top:8px;}
+
+.badge{display:inline-flex;font-family:monospace;font-weight:700;font-size:12.5px;color:#fff;background:var(--accent1);padding:5px 12px;border-radius:16px;margin-bottom:14px;}
+
+.roadmap{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;width:100%;margin-top:10px;}
+.roadmap-item{flex:1;min-width:130px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px 12px;text-align:center;}
+.roadmap-item .num{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;color:var(--accent1);}
+.roadmap-item .label{font-size:11.5px;color:var(--text-dim);margin-top:4px;font-family:monospace;}
+
+.chain{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:24px 0 6px;}
+.chain span{font-family:monospace;font-size:12.5px;padding:7px 14px;border-radius:16px;border:1px solid var(--accent1);color:var(--accent1);background:#f2f8fa;}
+
+.hero-topic{align-items:center;text-align:center;}
+.hero-topic .lede{margin:0 auto;}
+.hero-topic h1{
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:clamp(42px,7vw,84px);
+  color:var(--heading);line-height:1;
+}
+.hero-sub{font-family:monospace;color:var(--text-dim);font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-top:14px;}
+
+/* ===== bottom nav ===== */
+.bottombar{
+  height:84px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 5vw;border-top:1px solid var(--border);
+}
+.nav-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:12px 22px;border-radius:9px;border:1.5px solid var(--accent1);
+  background:#fff;color:var(--accent1);font-family:'Poppins',sans-serif;font-weight:600;font-size:14.5px;
+  cursor:pointer;transition:background .2s ease,color .2s ease,transform .2s ease;
+}
+.nav-btn:hover:not(:disabled){background:var(--accent1);color:#fff;transform:translateY(-2px);}
+.nav-btn:disabled{opacity:.35;cursor:default;}
+.nav-btn svg{width:16px;height:16px;}
+.nav-btn.next{background:var(--accent1);color:#fff;}
+.nav-btn.next:hover:not(:disabled){background:var(--heading);border-color:var(--heading);}
+
+.dots{display:flex;gap:7px;}
+.dots button{width:8px;height:8px;border-radius:50%;background:var(--border);border:none;cursor:pointer;transition:all .25s ease;}
+.dots button.active{background:var(--accent1);width:22px;border-radius:5px;}
+
+/* ===================================================================
+   PHONE / SMALL-SCREEN RESPONSIVE MODE
+   Below this width the page becomes a normal scrolling document:
+   the topbar and bottombar stick in place while the active topic's
+   content simply flows and scrolls with the page — no more fixed,
+   clipped viewport.
+=================================================================== */
+@media (max-width:768px){
+  html,body{height:auto;overflow:visible;}
+
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    background:#fff;
+    height:auto;
+    padding:12px 5vw;
+    flex-wrap:wrap;
+    row-gap:8px;
+  }
+  .brand{font-size:14px;order:1;}
+  .counter{order:2;font-size:12px;}
+  .progress-track{order:3;flex-basis:100%;max-width:100%;margin:0;height:5px;}
+
+  .viewport{
+    height:auto;
+    overflow:visible;
+    position:static;
+  }
+  .topic{
+    position:static;
+    display:none;
+    opacity:1;
+    transform:none;
+    pointer-events:auto;
+    height:auto;
+    min-height:calc(var(--vh, 1vh) * 100 - var(--bars-height, 130px));
+    overflow-y:visible;
+    padding:26px 6vw 40px;
+    transition:none;
+  }
+  .topic.active{display:flex;}
+
+  .two-col{gap:26px;}
+  .hero-topic h1{font-size:clamp(36px,13vw,40px);}
+  .topic h2{font-size:clamp(22px,6vw,30px);}
+  .lede{font-size:15px;}
+
+  .card-grid{grid-template-columns:1fr 1fr;gap:12px;}
+  .tables-row{flex-direction:column;}
+  .tables-row>div{min-width:0;width:100%;}
+
+  .bottombar{
+    position:sticky;bottom:0;z-index:20;
+    background:#fff;
+    height:auto;
+    padding:12px 5vw;
+    padding-bottom:calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width:480px){
+  .card-grid{grid-template-columns:1fr;}
+  .topic{padding:22px 5vw 36px;}
+  table{font-size:12.5px;}
+  th,td{padding:7px 10px;}
+}
+
+@media (max-width:640px){
+  .nav-btn span{display:none;}
+  .nav-btn{padding:12px 14px;}
+  .dots{display:none;}
+}
 </style>
 </head>
 <body>
