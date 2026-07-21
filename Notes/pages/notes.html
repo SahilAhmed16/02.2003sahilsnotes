@@ -446,6 +446,9 @@
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(180deg, #3b82f6, #38bdf8);
         }
+        .subject-tab:nth-child(6) {
+    animation: cardPop 0.6s ease-out 1.55s both;
+}
     </style>
 </head>
 <body>
@@ -480,14 +483,14 @@
                 <div class="tab-arrow">→</div>
             </a>
 
-            <a href="operating_system.html" class="subject-tab" onclick="createRipple(event, this)">
+            <a href="Operating_system.html" class="subject-tab" onclick="createRipple(event, this)">
                 <div class="tab-icon-wrap">⚙️</div>
                 <div class="tab-title">Operating System</div>
                 <div class="tab-subtitle">System Software & Architecture</div>
                 <div class="tab-arrow">→</div>
             </a>
 
-            <a href="java.html" class="subject-tab" onclick="createRipple(event, this)">
+            <a href="Java.html" class="subject-tab" onclick="createRipple(event, this)">
                 <div class="tab-icon-wrap">☕</div>
                 <div class="tab-title">Java Programming</div>
                 <div class="tab-subtitle">Object-Oriented Development</div>
@@ -498,6 +501,12 @@
                 <div class="tab-icon-wrap">🖥️</div>
                 <div class="tab-title">Computer Architecture</div>
                 <div class="tab-subtitle">Hardware & Organization</div>
+                <div class="tab-arrow">→</div>
+            </a>
+            <a href="assignments\assignmentTab.html" class="subject-tab" onclick="createRipple(event, this)">
+                <div class="tab-icon-wrap">📝</div>
+                <div class="tab-title">Assignments</div>
+                <div class="tab-subtitle">Internal & External</div>
                 <div class="tab-arrow">→</div>
             </a>
         </div>
