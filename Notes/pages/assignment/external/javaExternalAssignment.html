@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS Notes</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+/* ============================================================
+   Java Notes — corkboard gallery
+   Tokens
+   ============================================================ */
+:root {
+    --bg-deep: #14171f;
+    --bg-deep-2: #191d27;
+    --paper: #f1e9d6;
+    --paper-edge: #e2d6b6;
+    --ink: #2a2620;
+    --ink-soft: #6b6355;
+    --accent-tape: #f2c14e;
+    --accent-pin: #b8432f;
+    --accent-blue: #4c85ab;
+    --text-light: #ece6d6;
+    --text-dim: #b9b2a0;
+
+    --font-hand: 'Caveat', cursive;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    color: var(--text-light);
+    background-color: var(--bg-deep);
+    background-image:
+        radial-gradient(circle at 15% 10%, rgba(255,255,255,0.035), transparent 42%),
+        radial-gradient(circle at 85% 75%, rgba(255,255,255,0.03), transparent 45%),
+        repeating-radial-gradient(circle at center, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1.5px, transparent 34px);
+    overflow-x: hidden;
+}
+
+/* ============================================================
+   Header — a scrap of paper pinned to the board
+   ============================================================ */
+.board-header {
+    position: relative;
+    max-width: 620px;
+    margin: 4.5rem auto 1rem;
+    padding: 1.5rem 2rem 1.75rem;
+    text-align: center;
+}
+
+.board-eyebrow {
+    margin: 0 0 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim, #8f8879);
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.15s;
+}
+
+.board-title {
+    margin: 0;
+    font-family: var(--font-hand);
+    font-weight: 700;
+    font-size: clamp(3rem, 8vw, 4.6rem);
+    line-height: 1;
+    color: var(--text-light);
+    transform: rotate(-2deg);
+    text-shadow: 0 2px 18px rgba(0,0,0,0.35);
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.3s;
+}
+
+.board-pin {
+    position: absolute;
+    top: 0.4rem;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e2725a, var(--accent-pin) 70%);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.5), 0 0 0 3px rgba(0,0,0,0.15);
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   Gallery grid
+   ============================================================ */
+.image-notes-page {
+    padding-bottom: 5rem;
+}
+
+.notes-gallery {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 3rem 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 3rem 2.6rem;
+    align-items: start;
+}
+
+/* ============================================================
+   Note card (built around each <img> at runtime by script.js)
+   ============================================================ */
+.note-card {
+    --rot: 0deg;
+    position: relative;
+    background: var(--paper);
+    padding: 12px 12px 34px;
+    border-radius: 2px;
+    box-shadow:
+        0 14px 28px -10px rgba(0,0,0,0.55),
+        0 3px 8px rgba(0,0,0,0.35);
+    transform: rotate(var(--rot));
+    transition: transform 0.4s cubic-bezier(.2,.8,.2,1), box-shadow 0.4s cubic-bezier(.2,.8,.2,1);
+    cursor: grab;
+    opacity: 0;
+    animation: cardIn 0.65s cubic-bezier(.2,.8,.2,1) forwards;
+    animation-delay: calc(var(--i, 0) * 55ms + 0.2s);
+    touch-action: none;
+    user-select: none;
+    will-change: transform;
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(26px) rotate(var(--rot)) scale(0.94); }
+    to   { opacity: 1; transform: translateY(0) rotate(var(--rot)) scale(1); }
+}
+
+.note-card:hover {
+    transform: rotate(0deg) translateY(-10px) scale(1.035);
+    box-shadow:
+        0 26px 40px -12px rgba(0,0,0,0.6),
+        0 6px 14px rgba(0,0,0,0.4);
+    z-index: 5;
+}
+
+.note-card::before {
+    /* washi tape */
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    width: 66px;
+    height: 26px;
+    margin-left: -33px;
+    background: var(--accent-tape);
+    opacity: 0.85;
+    mix-blend-mode: multiply;
+    transform: rotate(-3deg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+.note-card__frame {
+    position: relative;
+    overflow: hidden;
+    background: #ddd3b6;
+    border: 1px solid rgba(0,0,0,0.08);
+    aspect-ratio: 3 / 4;
+}
+
+.note-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(0.06) contrast(1.03) saturate(1.02);
+    opacity: 0;
+    transform: scale(1.04);
+    transition: opacity 0.5s ease, transform 0.5s ease, filter 0.35s ease;
+}
+
+.note-card img.is-loaded {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.note-card:hover img {
+    filter: sepia(0) contrast(1.05) saturate(1.05);
+}
+
+.note-card__badge {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+}
+
+.note-card__label {
+    position: absolute;
+    left: 12px;
+    bottom: 10px;
+    font-family: var(--font-hand);
+    font-size: 1.05rem;
+    color: var(--ink);
+    opacity: 0.8;
+}
+
+/* dragging state */
+.note-card.is-dragging {
+    cursor: grabbing;
+    z-index: 50;
+    box-shadow:
+        0 34px 50px -14px rgba(0,0,0,0.7),
+        0 8px 18px rgba(0,0,0,0.5);
+    transition: none;
+}
+
+.note-card.is-settling {
+    transition: transform 0.35s cubic-bezier(.2,.8,.2,1);
+}
+
+.note-card.is-drop-target {
+    outline: 2px dashed var(--accent-blue);
+    outline-offset: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .note-card, .board-title, .board-eyebrow, .note-card img {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* ============================================================
+   Lightbox
+   ============================================================ */
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background: rgba(10, 12, 16, 0.88);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+}
+
+.lightbox-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.lightbox-stage {
+    position: relative;
+    max-width: min(82vw, 900px);
+    max-height: 84vh;
+    perspective: 1400px;
+}
+
+.lightbox-img {
+    display: block;
+    max-width: min(82vw, 900px);
+    max-height: 80vh;
+    border: 6px solid var(--paper);
+    border-radius: 2px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    transform: rotateY(-90deg);
+    opacity: 0;
+    transition: transform 0.42s cubic-bezier(.2,.8,.2,1), opacity 0.3s ease;
+}
+
+.lightbox-overlay.is-open .lightbox-img {
+    transform: rotateY(0deg);
+    opacity: 1;
+}
+
+.lightbox-counter {
+    margin: 0.9rem 0 0;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: var(--text-dim, #b9b2a0);
+}
+
+.lightbox-close,
+.lightbox-nav {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.lightbox-close:hover,
+.lightbox-nav:hover {
+    background: var(--accent-blue);
+    transform: scale(1.08);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 42px;
+    height: 42px;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.lightbox-nav {
+    width: 52px;
+    height: 52px;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+    .notes-gallery { padding: 1.25rem 1.25rem 3rem; gap: 2.5rem 1.5rem; }
+    .note-card { --rot: 0deg !important; }
+    .lightbox-nav { width: 42px; height: 42px; font-size: 1.4rem; }
+    .board-header { margin-top: 3rem; }
+}
+
+    </style>
+</head>
+<body>
+
+<section class="image-notes-page">
+
+    <header class="board-header">
+        <p class="board-eyebrow">15 pages &middot; drag a card to reorder &middot; click to open</p>
+        <h1 class="board-title">Java External Assignments</h1>
+        <span class="board-pin" aria-hidden="true"></span>
+    </header>
+
+    <div class="notes-gallery" id="notesGallery">
+
+<img src="javaExternalAssignment/1.jpg" draggable="false" alt="java 1">
+<img src="javaExternalAssignment/2.jpg" draggable="false" alt="java 2">
+<img src="javaExternalAssignment/3.jpg" draggable="false" alt="java 3">
+<img src="javaExternalAssignment/4.jpg" draggable="false" alt="java 4">
+<img src="javaExternalAssignment/5.jpg" draggable="false" alt="java 5">
+<img src="javaExternalAssignment/6.jpg" draggable="false" alt="java 6">
+<img src="javaExternalAssignment/7.jpg" draggable="false" alt="java 7">
+<img src="javaExternalAssignment/8.jpg" draggable="false" alt="java 8">
+<img src="javaExternalAssignment/9.jpg" draggable="false" alt="java 9">
+<img src="javaExternalAssignment/10.jpg" draggable="false" alt="java 10">
+<img src="javaExternalAssignment/11.jpg" draggable="false" alt="java 11">
+<img src="javaExternalAssignment/12.jpg" draggable="false" alt="java 12">
+<img src="javaExternalAssignment/13.jpg" draggable="false" alt="java 13">
+<img src="javaExternalAssignment/14.jpg" draggable="false" alt="java 14">
+<img src="javaExternalAssignment/15.jpg" draggable="false" alt="java 15">
+
+    </div>
+
+</section>
+
+<div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous">&#8249;</button>
+    <div class="lightbox-stage">
+        <img src="" alt="" id="lightboxImg" class="lightbox-img">
+        <p class="lightbox-counter" id="lightboxCounter">01 / 15</p>
+    </div>
+    <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next">&#8250;</button>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const gallery = document.getElementById('notesGallery');
+  if (!gallery) return;
+
+  const STORAGE_KEY = 'javaNotesOrder';
+  const DRAG_THRESHOLD = 6; // px of movement before a press counts as a drag, not a click
+
+  /* ------------------------------------------------------------
+     1. Wrap every <img> in a draggable "note card"
+     ------------------------------------------------------------ */
+  const rawImages = Array.from(gallery.querySelectorAll('img'));
+
+  function buildCard(img, index) {
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.style.setProperty('--i', index);
+    card.style.setProperty('--rot', `${(index % 2 === 0 ? -1 : 1) * (2 + (index % 3))}deg`);
+    card.dataset.src = img.getAttribute('src');
+
+    const frame = document.createElement('div');
+    frame.className = 'note-card__frame';
+
+    img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true });
+    if (img.complete) img.classList.add('is-loaded');
+
+    frame.appendChild(img);
+    card.appendChild(frame);
+
+    const badge = document.createElement('span');
+    badge.className = 'note-card__badge';
+    badge.textContent = `#${String(index + 1).padStart(2, '0')}`;
+    card.appendChild(badge);
+
+    return card;
+  }
+
+  const cards = rawImages.map(buildCard);
+  gallery.innerHTML = '';
+  cards.forEach(c => gallery.appendChild(c));
+
+  /* ------------------------------------------------------------
+     2. Restore any saved order from a previous visit
+     ------------------------------------------------------------ */
+  function applySavedOrder() {
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }
+    catch (e) { saved = null; }
+    if (!Array.isArray(saved) || !saved.length) return;
+
+    const bySrc = new Map(Array.from(gallery.children).map(c => [c.dataset.src, c]));
+    saved.forEach(src => {
+      const el = bySrc.get(src);
+      if (el) gallery.appendChild(el);
+    });
+    renumber();
+  }
+
+  function saveOrder() {
+    const order = Array.from(gallery.children).map(c => c.dataset.src);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(order)); } catch (e) {}
+  }
+
+  function renumber() {
+    Array.from(gallery.children).forEach((card, i) => {
+      const badge = card.querySelector('.note-card__badge');
+      if (badge) badge.textContent = `#${String(i + 1).padStart(2, '0')}`;
+    });
+  }
+
+  applySavedOrder();
+
+  /* ------------------------------------------------------------
+     3. Pointer-based drag & drop reordering with FLIP animation
+     ------------------------------------------------------------ */
+  let dragCard = null;
+  let startX = 0, startY = 0, originX = 0, originY = 0;
+  let isDragging = false;
+  let pointerId = null;
+
+  function getCardsExcept(el) {
+    return Array.from(gallery.children).filter(c => c !== el);
+  }
+
+  function onPointerDown(e) {
+    const card = e.target.closest('.note-card');
+    if (!card) return;
+    dragCard = card;
+    pointerId = e.pointerId;
+    startX = e.clientX;
+    startY = e.clientY;
+    const rect = card.getBoundingClientRect();
+    originX = rect.left;
+    originY = rect.top;
+    isDragging = false;
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+  }
+
+  function beginDrag(card) {
+    isDragging = true;
+    card.setPointerCapture && card.setPointerCapture(pointerId);
+    const rect = card.getBoundingClientRect();
+    card.style.position = 'fixed';
+    card.style.left = `${rect.left}px`;
+    card.style.top = `${rect.top}px`;
+    card.style.width = `${rect.width}px`;
+    card.style.margin = '0';
+    card.classList.add('is-dragging');
+    document.body.style.cursor = 'grabbing';
+  }
+
+  function onPointerMove(e) {
+    if (!dragCard) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (!isDragging) {
+      if (Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
+      beginDrag(dragCard);
+    }
+
+    dragCard.style.left = `${originX + dx}px`;
+    dragCard.style.top = `${originY + dy}px`;
+
+    // find which sibling we're hovering over and reorder
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    const overCard = target && target.closest('.note-card');
+    if (overCard && overCard !== dragCard) {
+      const siblings = getCardsExcept(dragCard);
+      const overRect = overCard.getBoundingClientRect();
+      const before = e.clientY < overRect.top + overRect.height / 2;
+
+      recordFlipStart(siblings);
+      if (before) {
+        gallery.insertBefore(dragCard, overCard);
+      } else {
+        gallery.insertBefore(dragCard, overCard.nextSibling);
+      }
+      playFlip(siblings);
+    }
+  }
+
+  function onPointerUp() {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+
+    if (dragCard && isDragging) {
+      const card = dragCard;
+      card.style.position = '';
+      card.style.left = '';
+      card.style.top = '';
+      card.style.width = '';
+      card.style.margin = '';
+      card.classList.remove('is-dragging');
+      document.body.style.cursor = '';
+      renumber();
+      saveOrder();
+    } else if (dragCard && !isDragging) {
+      // was a genuine click, not a drag -> open the lightbox
+      openLightbox(dragCard);
+    }
+    dragCard = null;
+    isDragging = false;
+  }
+
+  gallery.addEventListener('pointerdown', onPointerDown);
+
+  /* FLIP: record first positions, then after DOM move, animate from old to new */
+  let flipFirstRects = new Map();
+  function recordFlipStart(elements) {
+    flipFirstRects = new Map(elements.map(el => [el, el.getBoundingClientRect()]));
+  }
+  function playFlip(elements) {
+    elements.forEach(el => {
+      const first = flipFirstRects.get(el);
+      if (!first) return;
+      const last = el.getBoundingClientRect();
+      const dx = first.left - last.left;
+      const dy = first.top - last.top;
+      if (!dx && !dy) return;
+      el.style.transition = 'none';
+      el.style.transform = `translate(${dx}px, ${dy}px) rotate(var(--rot))`;
+      requestAnimationFrame(() => {
+        el.classList.add('is-settling');
+        el.style.transform = '';
+        el.addEventListener('transitionend', () => {
+          el.classList.remove('is-settling');
+          el.style.transition = '';
+        }, { once: true });
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------
+     4. Lightbox viewer
+     ------------------------------------------------------------ */
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCounter = document.getElementById('lightboxCounter');
+  const btnClose = document.getElementById('lightboxClose');
+  const btnPrev = document.getElementById('lightboxPrev');
+  const btnNext = document.getElementById('lightboxNext');
+
+  let currentIndex = 0;
+
+  function currentCards() {
+    return Array.from(gallery.children);
+  }
+
+  function openLightbox(card) {
+    const list = currentCards();
+    currentIndex = list.indexOf(card);
+    showAt(currentIndex);
+    lightbox.classList.add('is-open');
+    document.addEventListener('keydown', onKeydown);
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('is-open');
+    document.removeEventListener('keydown', onKeydown);
+  }
+
+  function showAt(index) {
+    const list = currentCards();
+    if (!list.length) return;
+    currentIndex = (index + list.length) % list.length;
+    const src = list[currentIndex].dataset.src;
+
+    lightboxImg.style.transition = 'none';
+    lightboxImg.style.opacity = '0';
+    lightboxImg.style.transform = 'rotateY(-90deg)';
+    lightboxImg.src = src;
+    lightboxImg.alt = `Java notes page ${currentIndex + 1}`;
+
+    requestAnimationFrame(() => {
+      lightboxImg.style.transition = '';
+      lightboxImg.style.opacity = '1';
+      lightboxImg.style.transform = 'rotateY(0deg)';
+    });
+
+    lightboxCounter.textContent =
+      `${String(currentIndex + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}`;
+  }
+
+  function onKeydown(e) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') showAt(currentIndex + 1);
+    if (e.key === 'ArrowLeft') showAt(currentIndex - 1);
+  }
+
+  btnClose.addEventListener('click', closeLightbox);
+  btnPrev.addEventListener('click', () => showAt(currentIndex - 1));
+  btnNext.addEventListener('click', () => showAt(currentIndex + 1));
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+})();
+
+</script>
+
+</body>
+</html>
