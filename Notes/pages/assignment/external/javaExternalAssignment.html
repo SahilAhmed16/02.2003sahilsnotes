@@ -11,7 +11,7 @@
 
     <style>
 /* ============================================================
-   Java Notes — corkboard gallery
+   Java Notes — corkboard gallery (scrollable, no reorder)
    Tokens
    ============================================================ */
 :root {
@@ -75,7 +75,7 @@ body {
     margin: 0;
     font-family: var(--font-hand);
     font-weight: 700;
-    font-size: clamp(3rem, 8vw, 4.6rem);
+    font-size: clamp(2.4rem, 8vw, 4.6rem);
     line-height: 1;
     color: var(--text-light);
     transform: rotate(-2deg);
@@ -102,7 +102,7 @@ body {
 }
 
 /* ============================================================
-   Gallery grid
+   Gallery grid — simple responsive layout, page scroll only
    ============================================================ */
 .image-notes-page {
     padding-bottom: 5rem;
@@ -111,10 +111,10 @@ body {
 .notes-gallery {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem 3rem 4rem;
+    padding: 2rem clamp(1rem, 4vw, 3rem) 4rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 3rem 2.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2.6rem);
     align-items: start;
 }
 
@@ -132,13 +132,11 @@ body {
         0 3px 8px rgba(0,0,0,0.35);
     transform: rotate(var(--rot));
     transition: transform 0.4s cubic-bezier(.2,.8,.2,1), box-shadow 0.4s cubic-bezier(.2,.8,.2,1);
-    cursor: grab;
+    cursor: pointer;
     opacity: 0;
     animation: cardIn 0.65s cubic-bezier(.2,.8,.2,1) forwards;
     animation-delay: calc(var(--i, 0) * 55ms + 0.2s);
-    touch-action: none;
     user-select: none;
-    will-change: transform;
 }
 
 @keyframes cardIn {
@@ -146,12 +144,19 @@ body {
     to   { opacity: 1; transform: translateY(0) rotate(var(--rot)) scale(1); }
 }
 
-.note-card:hover {
+.note-card:hover,
+.note-card:focus-visible {
     transform: rotate(0deg) translateY(-10px) scale(1.035);
     box-shadow:
         0 26px 40px -12px rgba(0,0,0,0.6),
         0 6px 14px rgba(0,0,0,0.4);
     z-index: 5;
+    outline: none;
+}
+
+.note-card:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 4px;
 }
 
 .note-card::before {
@@ -209,35 +214,6 @@ body {
     color: var(--ink-soft);
 }
 
-.note-card__label {
-    position: absolute;
-    left: 12px;
-    bottom: 10px;
-    font-family: var(--font-hand);
-    font-size: 1.05rem;
-    color: var(--ink);
-    opacity: 0.8;
-}
-
-/* dragging state */
-.note-card.is-dragging {
-    cursor: grabbing;
-    z-index: 50;
-    box-shadow:
-        0 34px 50px -14px rgba(0,0,0,0.7),
-        0 8px 18px rgba(0,0,0,0.5);
-    transition: none;
-}
-
-.note-card.is-settling {
-    transition: transform 0.35s cubic-bezier(.2,.8,.2,1);
-}
-
-.note-card.is-drop-target {
-    outline: 2px dashed var(--accent-blue);
-    outline-offset: 6px;
-}
-
 @media (prefers-reduced-motion: reduce) {
     .note-card, .board-title, .board-eyebrow, .note-card img {
         animation: none !important;
@@ -263,6 +239,7 @@ body {
     pointer-events: none;
     transition: opacity 0.3s ease;
     z-index: 100;
+    padding: 1rem;
 }
 
 .lightbox-overlay.is-open {
@@ -339,11 +316,33 @@ body {
     flex-shrink: 0;
 }
 
+/* ============================================================
+   Responsive breakpoints
+   ============================================================ */
+@media (max-width: 900px) {
+    .notes-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    }
+}
+
 @media (max-width: 640px) {
-    .notes-gallery { padding: 1.25rem 1.25rem 3rem; gap: 2.5rem 1.5rem; }
+    .notes-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 1.25rem 1.25rem 3rem;
+        gap: 2rem 1.25rem;
+    }
     .note-card { --rot: 0deg !important; }
+    .board-header { margin-top: 3rem; padding: 1rem 1.25rem 1.5rem; }
     .lightbox-nav { width: 42px; height: 42px; font-size: 1.4rem; }
-    .board-header { margin-top: 3rem; }
+    .lightbox-close { top: 1rem; right: 1rem; width: 36px; height: 36px; }
+    .lightbox-overlay { gap: 0.5rem; }
+}
+
+@media (max-width: 420px) {
+    .notes-gallery {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem 1rem;
+    }
 }
 
     </style>
@@ -353,7 +352,7 @@ body {
 <section class="image-notes-page">
 
     <header class="board-header">
-        <p class="board-eyebrow">15 pages &middot; drag a card to reorder &middot; click to open</p>
+        <p class="board-eyebrow">15 pages &middot; click a card to view</p>
         <h1 class="board-title">Java External Assignments</h1>
         <span class="board-pin" aria-hidden="true"></span>
     </header>
@@ -397,17 +396,17 @@ body {
   const gallery = document.getElementById('notesGallery');
   if (!gallery) return;
 
-  const STORAGE_KEY = 'javaNotesOrder';
-  const DRAG_THRESHOLD = 6; // px of movement before a press counts as a drag, not a click
-
   /* ------------------------------------------------------------
-     1. Wrap every <img> in a draggable "note card"
+     1. Wrap every <img> in a simple note card (no drag logic)
      ------------------------------------------------------------ */
   const rawImages = Array.from(gallery.querySelectorAll('img'));
 
   function buildCard(img, index) {
     const card = document.createElement('div');
     card.className = 'note-card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `Open page ${index + 1}`);
     card.style.setProperty('--i', index);
     card.style.setProperty('--rot', `${(index % 2 === 0 ? -1 : 1) * (2 + (index % 3))}deg`);
     card.dataset.src = img.getAttribute('src');
@@ -426,6 +425,14 @@ body {
     badge.textContent = `#${String(index + 1).padStart(2, '0')}`;
     card.appendChild(badge);
 
+    card.addEventListener('click', () => openLightbox(card));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLightbox(card);
+      }
+    });
+
     return card;
   }
 
@@ -434,160 +441,7 @@ body {
   cards.forEach(c => gallery.appendChild(c));
 
   /* ------------------------------------------------------------
-     2. Restore any saved order from a previous visit
-     ------------------------------------------------------------ */
-  function applySavedOrder() {
-    let saved;
-    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }
-    catch (e) { saved = null; }
-    if (!Array.isArray(saved) || !saved.length) return;
-
-    const bySrc = new Map(Array.from(gallery.children).map(c => [c.dataset.src, c]));
-    saved.forEach(src => {
-      const el = bySrc.get(src);
-      if (el) gallery.appendChild(el);
-    });
-    renumber();
-  }
-
-  function saveOrder() {
-    const order = Array.from(gallery.children).map(c => c.dataset.src);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(order)); } catch (e) {}
-  }
-
-  function renumber() {
-    Array.from(gallery.children).forEach((card, i) => {
-      const badge = card.querySelector('.note-card__badge');
-      if (badge) badge.textContent = `#${String(i + 1).padStart(2, '0')}`;
-    });
-  }
-
-  applySavedOrder();
-
-  /* ------------------------------------------------------------
-     3. Pointer-based drag & drop reordering with FLIP animation
-     ------------------------------------------------------------ */
-  let dragCard = null;
-  let startX = 0, startY = 0, originX = 0, originY = 0;
-  let isDragging = false;
-  let pointerId = null;
-
-  function getCardsExcept(el) {
-    return Array.from(gallery.children).filter(c => c !== el);
-  }
-
-  function onPointerDown(e) {
-    const card = e.target.closest('.note-card');
-    if (!card) return;
-    dragCard = card;
-    pointerId = e.pointerId;
-    startX = e.clientX;
-    startY = e.clientY;
-    const rect = card.getBoundingClientRect();
-    originX = rect.left;
-    originY = rect.top;
-    isDragging = false;
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
-  }
-
-  function beginDrag(card) {
-    isDragging = true;
-    card.setPointerCapture && card.setPointerCapture(pointerId);
-    const rect = card.getBoundingClientRect();
-    card.style.position = 'fixed';
-    card.style.left = `${rect.left}px`;
-    card.style.top = `${rect.top}px`;
-    card.style.width = `${rect.width}px`;
-    card.style.margin = '0';
-    card.classList.add('is-dragging');
-    document.body.style.cursor = 'grabbing';
-  }
-
-  function onPointerMove(e) {
-    if (!dragCard) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-
-    if (!isDragging) {
-      if (Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
-      beginDrag(dragCard);
-    }
-
-    dragCard.style.left = `${originX + dx}px`;
-    dragCard.style.top = `${originY + dy}px`;
-
-    // find which sibling we're hovering over and reorder
-    const target = document.elementFromPoint(e.clientX, e.clientY);
-    const overCard = target && target.closest('.note-card');
-    if (overCard && overCard !== dragCard) {
-      const siblings = getCardsExcept(dragCard);
-      const overRect = overCard.getBoundingClientRect();
-      const before = e.clientY < overRect.top + overRect.height / 2;
-
-      recordFlipStart(siblings);
-      if (before) {
-        gallery.insertBefore(dragCard, overCard);
-      } else {
-        gallery.insertBefore(dragCard, overCard.nextSibling);
-      }
-      playFlip(siblings);
-    }
-  }
-
-  function onPointerUp() {
-    window.removeEventListener('pointermove', onPointerMove);
-    window.removeEventListener('pointerup', onPointerUp);
-
-    if (dragCard && isDragging) {
-      const card = dragCard;
-      card.style.position = '';
-      card.style.left = '';
-      card.style.top = '';
-      card.style.width = '';
-      card.style.margin = '';
-      card.classList.remove('is-dragging');
-      document.body.style.cursor = '';
-      renumber();
-      saveOrder();
-    } else if (dragCard && !isDragging) {
-      // was a genuine click, not a drag -> open the lightbox
-      openLightbox(dragCard);
-    }
-    dragCard = null;
-    isDragging = false;
-  }
-
-  gallery.addEventListener('pointerdown', onPointerDown);
-
-  /* FLIP: record first positions, then after DOM move, animate from old to new */
-  let flipFirstRects = new Map();
-  function recordFlipStart(elements) {
-    flipFirstRects = new Map(elements.map(el => [el, el.getBoundingClientRect()]));
-  }
-  function playFlip(elements) {
-    elements.forEach(el => {
-      const first = flipFirstRects.get(el);
-      if (!first) return;
-      const last = el.getBoundingClientRect();
-      const dx = first.left - last.left;
-      const dy = first.top - last.top;
-      if (!dx && !dy) return;
-      el.style.transition = 'none';
-      el.style.transform = `translate(${dx}px, ${dy}px) rotate(var(--rot))`;
-      requestAnimationFrame(() => {
-        el.classList.add('is-settling');
-        el.style.transform = '';
-        el.addEventListener('transitionend', () => {
-          el.classList.remove('is-settling');
-          el.style.transition = '';
-        }, { once: true });
-      });
-    });
-  }
-
-  /* ------------------------------------------------------------
-     4. Lightbox viewer
+     2. Lightbox viewer
      ------------------------------------------------------------ */
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
